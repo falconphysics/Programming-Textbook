@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -476,7 +478,35 @@ For when you don't need the index, you can write <code>for (let s of scores) { p
 
 <p>Remember our three-ball mess from Chapter 6? Watch what arrays do for it:</p>
 
-<pre><code><span class="keyword">let</span> balls = [];
+
+<!-- Hidden support code: the Ball class from Chapter 6, so the
+     live examples below can run on their own. -->
+<pre id="def-ball-class" hidden><code>class Ball {
+  constructor(x, y, diameter) {
+    this.x = x;
+    this.y = y;
+    this.diameter = diameter;
+    this.xspeed = random(-3, 3);
+    this.yspeed = random(-3, 3);
+  }
+
+  move() {
+    this.x += this.xspeed;
+    this.y += this.yspeed;
+  }
+
+  bounce() {
+    if (this.x &lt; 0 || this.x &gt; width)  this.xspeed *= -1;
+    if (this.y &lt; 0 || this.y &gt; height) this.yspeed *= -1;
+  }
+
+  show() {
+    fill(237, 34, 93);
+    ellipse(this.x, this.y, this.diameter, this.diameter);
+  }
+}</code></pre>
+
+<pre class="runnable" data-include="#def-ball-class"><code><span class="keyword">let</span> balls = [];
 
 <span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
@@ -517,7 +547,7 @@ For when you don't need the index, you can write <code>for (let s of scores) { p
 
 <p>Here's where it gets dynamic. Let's start with no balls, and add a new one wherever the user clicks:</p>
 
-<pre><code><span class="keyword">let</span> balls = [];
+<pre class="runnable" data-include="#def-ball-class"><code><span class="keyword">let</span> balls = [];
 
 <span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
@@ -585,7 +615,7 @@ For when you don't need the index, you can write <code>for (let s of scores) { p
 
 <p>Here's a sketch that combines <em>everything</em> from this book. Spawn particles wherever the mouse moves; each particle has a life; when its life runs out, it gets removed.</p>
 
-<pre><code><span class="keyword">let</span> particles = [];
+<pre class="runnable"><code><span class="keyword">let</span> particles = [];
 
 <span class="keyword">class</span> <span class="class-name">Particle</span> {
   <span class="function">constructor</span>(x, y) {
@@ -691,6 +721,44 @@ You now know everything you need. Use objects, arrays, mouse interaction, and ra
 
 <p>You did it. Now go make something cool. 🚂✨</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> What is the index of the <em>first</em> item in an array?</p>
+<ol class="quiz-opts">
+<li data-explain="Tempting, but arrays start counting from a different number.">1</li>
+<li data-correct="" data-explain="Arrays are zero-indexed: bubbles[0] is the first item, and the last one is bubbles[bubbles.length - 1].">0</li>
+<li data-explain="In JavaScript it&#x27;s always the same: the first index is 0, every time.">It depends on the array</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> What does <code>bubbles.length</code> give you?</p>
+<ol class="quiz-opts">
+<li data-explain="Close — the last index is bubbles.length - 1, because counting starts at 0.">The index of the last bubble</li>
+<li data-correct="" data-explain="length is the live count. Add a bubble with push() and length goes up by one automatically.">How many items are in the array right now</li>
+<li data-explain="length is about the array itself, not the objects inside it.">The size (diameter) of each bubble</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> Why loop <em>backward</em> when removing items with <code>splice()</code>?</p>
+<ol class="quiz-opts">
+<li data-explain="Speed isn&#x27;t the issue — it&#x27;s about what happens to the indexes when an item disappears.">Backward loops run faster</li>
+<li data-explain="splice() works anywhere. The backward loop is a strategy, not a requirement."><code>splice()</code> only works in backward loops</li>
+<li data-correct="" data-explain="If you delete index 3 going forward, the old index 4 slides into slot 3 and gets skipped. Walking backward, the shift only affects items you&#x27;ve already checked.">Removing an item shifts everything after it down one index — going backward means you never skip an item</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines into the classic backward loop: walk the array from the end, <em>show</em> each bubble, then remove it with <code>splice()</code> if it's finished. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>for (let i = bubbles.length - 1; i &gt;= 0; i--) {
+  bubbles[i].show();
+  if (bubbles[i].finished()) {
+    bubbles.splice(i, 1);
+  }
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <a href="chapter06.html"><span class="label">← Previous</span><span class="title">Ch. 6: Objects</span></a>

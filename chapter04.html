@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -482,7 +484,7 @@ The counter is conventionally called <code>i</code> (for "index") when looping o
 
 <p>Remember that <code>draw()</code> already runs 60 times a second. If you put a loop <em>inside</em> draw(), the whole loop runs every frame. That's how you draw static patterns that interact with the mouse:</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
 }
 
@@ -499,7 +501,7 @@ The counter is conventionally called <code>i</code> (for "index") when looping o
 
 <p>Put a loop inside a loop and you can draw a grid. The outer loop walks down rows; the inner loop walks across each row.</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
   <span class="function">background</span>(<span class="number">220</span>);
   <span class="keyword">for</span> (<span class="keyword">let</span> y = <span class="number">20</span>; y &lt; <span class="function">height</span>; y += <span class="number">40</span>) {
@@ -582,6 +584,43 @@ Draw an 8×8 checkerboard. Each square should alternate between black and white.
 
 <p>Loops give you repetition. <strong>Functions</strong>, our next stop, give you reusable building blocks of code with names. Together they're how programs grow from sketches into worlds.</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> How many times does the body of <code>for (let i = 0; i &lt; 5; i++)</code> run?</p>
+<ol class="quiz-opts">
+<li data-explain="Count them: i = 0, 1, 2, 3, 4. The loop stops when i &amp;lt; 5 becomes false.">4 times</li>
+<li data-correct="" data-explain="i takes the values 0, 1, 2, 3, 4 — five trips through the loop. It stops when i reaches 5.">5 times</li>
+<li data-explain="The condition is i &amp;lt; 5, not i &amp;lt;= 5, so i = 5 never runs the body.">6 times</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> This loop freezes the sketch: <code>let x = 0; while (x &lt; width) { line(x, 0, x, height); }</code> Why?</p>
+<ol class="quiz-opts">
+<li data-explain="line() in a loop is fine — that&#x27;s exactly how you draw a set of stripes."><code>line()</code> can't be used in a loop</li>
+<li data-correct="" data-explain="Nothing inside the loop updates x, so x &amp;lt; width stays true forever — an infinite loop. Add x = x + 20; inside.">x never changes, so the condition never becomes false</li>
+<li data-explain="while loops work anywhere. The bug is what&#x27;s missing from the loop body."><code>while</code> loops only work inside <code>setup()</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> In a nested loop that draws a grid, how often does the <em>inner</em> loop run completely?</p>
+<ol class="quiz-opts">
+<li data-explain="The inner loop lives inside the outer loop&#x27;s body, so it runs as part of every outer trip.">Once, before the outer loop starts</li>
+<li data-explain="They don&#x27;t run side by side — the inner loop finishes all its trips within each outer trip.">Once total, at the same time as the outer loop</li>
+<li data-correct="" data-explain="Each outer iteration re-runs the whole inner loop — that&#x27;s how one row of the loop becomes a full grid.">Once for every single trip through the outer loop</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines to draw vertical lines across the canvas every 20 pixels, starting with a line at x = 0. (Hint: draw the line <em>before</em> moving x, or you'll skip the first one.) Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>let x = 0;
+while (x &lt; width) {
+  line(x, 0, x, height);
+  x = x + 20;
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <a href="chapter03.html"><span class="label">← Previous</span><span class="title">Ch. 3: Conditionals</span></a>

@@ -1,0 +1,263 @@
+/* ============================================================
+   p5.js Textbook — interactive widgets
+   Live sketch runner/editor, multiple-choice quizzes,
+   and Parsons Problems. Requires assets/interactive.js.
+   Inherits the page's CSS variables (--accent, --mono, etc.).
+   ============================================================ */
+
+/* ---------- Live, runnable sketches ---------- */
+.sketch-widget {
+  margin: 16px 0 24px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-left: 4px solid var(--accent, #ed225d);
+  background: var(--code-bg, #1e1e2e);
+}
+.sketch-widget pre {
+  margin: 0;
+  border-radius: 0;
+  border-left: none;
+  box-shadow: none;
+}
+.sketch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-family: var(--sans, sans-serif);
+}
+.sketch-toolbar .sketch-label {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  font-weight: 700;
+}
+.sketch-btn {
+  font-family: var(--sans, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+  line-height: 1.2;
+}
+.sketch-btn:active { transform: translateY(1px); }
+.sketch-btn:focus-visible,
+.quiz-opts li:focus-visible,
+.parsons-btn:focus-visible,
+.parsons-line:focus-visible {
+  outline: 2px solid var(--accent, #ed225d);
+  outline-offset: 2px;
+}
+.sketch-btn-run {
+  background: var(--accent, #ed225d);
+  color: #fff;
+}
+.sketch-btn-run:hover { background: var(--accent-dark, #b8174a); }
+.sketch-btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  border-color: rgba(255,255,255,0.25);
+}
+.sketch-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.sketch-editor {
+  display: block;
+  width: 100%;
+  border: none;
+  resize: vertical;
+  background: var(--code-bg, #1e1e2e);
+  color: var(--code-ink, #f5f5f5);
+  font-family: var(--mono, monospace);
+  font-size: 14.5px;
+  line-height: 1.55;
+  padding: 18px 20px;
+  min-height: 80px;
+  tab-size: 2;
+  caret-color: var(--accent, #ed225d);
+}
+.sketch-editor:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(237,34,93,0.5); }
+
+.sketch-output {
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+}
+.sketch-output iframe {
+  border: none;
+  max-width: 100%;
+  background: #fff;
+}
+.sketch-hint {
+  font-family: var(--sans, sans-serif);
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.5);
+  padding: 0 12px 8px;
+  margin: 0;
+}
+
+/* ---------- Quiz section shell ---------- */
+.quiz-section { margin-top: 8px; }
+.quiz-card {
+  background: var(--bg-panel, #fff);
+  border: 1px solid var(--rule, #e8e2d3);
+  border-left: 4px solid var(--accent, #ed225d);
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin: 20px 0 28px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+.quiz-q {
+  font-family: var(--sans, sans-serif);
+  font-weight: 700;
+  font-size: 1.02rem;
+  margin: 0 0 14px;
+}
+.quiz-q .quiz-tag {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent, #ed225d);
+  margin-right: 8px;
+}
+
+/* ---------- Multiple choice ---------- */
+.quiz-opts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.quiz-opts li {
+  font-family: var(--sans, sans-serif);
+  font-size: 0.98rem;
+  padding: 10px 14px;
+  border: 1.5px solid var(--rule, #e8e2d3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #fff;
+}
+.quiz-opts li:hover { border-color: var(--accent, #ed225d); background: rgba(237,34,93,0.04); }
+.quiz-opts li.is-right {
+  border-color: var(--tip-bd, #66bb6a);
+  background: var(--tip-bg, #e8f5e9);
+  font-weight: 700;
+}
+.quiz-opts li.is-wrong {
+  border-color: var(--err-bd, #e53935);
+  background: var(--err-bg, #ffebee);
+}
+.quiz-mc.is-answered .quiz-opts li { cursor: default; }
+.quiz-mc.is-answered .quiz-opts li:not(.is-right):not(.is-wrong) { opacity: 0.55; }
+.quiz-mc.is-answered .quiz-opts li:hover:not(.is-right):not(.is-wrong) {
+  border-color: var(--rule, #e8e2d3);
+  background: #fff;
+}
+
+.quiz-feedback {
+  font-family: var(--sans, sans-serif);
+  font-size: 0.95rem;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  display: none;
+}
+.quiz-feedback.is-right { display: block; background: var(--tip-bg, #e8f5e9); border-left: 4px solid var(--tip-bd, #66bb6a); }
+.quiz-feedback.is-wrong { display: block; background: var(--err-bg, #ffebee); border-left: 4px solid var(--err-bd, #e53935); }
+.quiz-feedback.is-partial { display: block; background: var(--alert-bg, #fff8e1); border-left: 4px solid var(--alert-bd, #ffb300); }
+
+/* ---------- Parsons Problems ---------- */
+.parsons-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.parsons-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--code-bg, #1e1e2e);
+  color: var(--code-ink, #f5f5f5);
+  border-radius: 8px;
+  padding: 8px 10px 8px 14px;
+  border: 2px solid transparent;
+  cursor: grab;
+  touch-action: none;
+}
+.parsons-line.is-dragging { opacity: 0.5; cursor: grabbing; }
+.parsons-line.is-right { border-color: var(--tip-bd, #66bb6a); }
+.parsons-line.is-wrong { border-color: var(--err-bd, #e53935); }
+.parsons-code {
+  font-family: var(--mono, monospace);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+  flex: 1;
+}
+.parsons-arrows { display: flex; gap: 4px; }
+.parsons-btn {
+  font-family: var(--sans, sans-serif);
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+.parsons-btn:hover { background: rgba(255,255,255,0.22); }
+.parsons-toolbar { display: flex; gap: 8px; align-items: center; }
+.parsons-check {
+  background: var(--accent, #ed225d);
+  color: #fff;
+  border: none;
+  font-family: var(--sans, sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.parsons-check:hover { background: var(--accent-dark, #b8174a); }
+.parsons-shuffle {
+  background: transparent;
+  border: 1.5px solid var(--rule, #e8e2d3);
+  color: var(--ink-soft, #4a4a4a);
+  font-family: var(--sans, sans-serif);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.parsons-shuffle:hover { border-color: var(--accent, #ed225d); color: var(--accent-dark, #b8174a); }
+
+/* ---------- Print & motion ---------- */
+@media print {
+  .sketch-toolbar, .sketch-output, .sketch-hint,
+  .parsons-toolbar, .parsons-arrows, .quiz-feedback { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sketch-btn, .quiz-opts li { transition: none; }
+}
+@media (max-width: 560px) {
+  .sketch-toolbar { flex-wrap: wrap; }
+  .sketch-toolbar .sketch-label { display: none; }
+}

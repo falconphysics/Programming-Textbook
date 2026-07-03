@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -441,7 +443,7 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 
 <p>p5.js gives you a couple of variables <strong>for free</strong> — they already exist, you don't have to declare them, and they update automatically. The two most useful ones are <code>mouseX</code> and <code>mouseY</code>: at any moment, they hold the current x and y position of the mouse on the canvas.</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
 }
 
@@ -481,7 +483,7 @@ Comment out the <code>background(220);</code> line by adding <code>//</code> in 
   <li>Change the variable a little bit at the end of <code>draw()</code>.</li>
 </ol>
 
-<pre><code><span class="keyword">let</span> x = <span class="number">0</span>;
+<pre class="runnable"><code><span class="keyword">let</span> x = <span class="number">0</span>;
 
 <span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
@@ -515,7 +517,7 @@ Comment out the <code>background(220);</code> line by adding <code>//</code> in 
 
 <p>Here's a sketch that paints random colorful dots forever. Notice we don't call <code>background()</code> inside <code>draw()</code> — so the dots accumulate:</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
   <span class="function">background</span>(<span class="number">0</span>);
   <span class="function">noStroke</span>();
@@ -603,6 +605,47 @@ Use <code>map()</code> to make <em>three</em> things change as the mouse moves a
 
 <p>Variables — you've got them. Animation — you've got that too. Up next: <strong>conditionals</strong>, the if/else statements that let your sketch make decisions. We're about to make that circle <em>actually</em> bounce.</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> What value does the built-in variable <code>mouseX</code> hold?</p>
+<ol class="quiz-opts">
+<li data-correct="" data-explain="p5 updates mouseX (and mouseY) automatically every frame, so your sketch can follow the mouse.">The horizontal position of the mouse right now</li>
+<li data-explain="mouseX updates constantly as the mouse moves — no click required.">The position where the mouse was last clicked</li>
+<li data-explain="mouseX comes built in — p5 declares and updates it for you.">A number you have to set yourself with <code>let</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> You want a circle that grows a little bigger every frame. Where should you declare <code>let size = 10;</code>?</p>
+<ol class="quiz-opts">
+<li data-explain="Declaring it inside draw() re-creates it at 10 every single frame — the circle never grows.">Inside <code>draw()</code></li>
+<li data-correct="" data-explain="A global variable is declared once and keeps its value between frames, so size can keep climbing.">At the top of the sketch, outside <code>setup()</code> and <code>draw()</code></li>
+<li data-explain="A variable declared inside setup() only exists inside setup() — draw() can&#x27;t see it.">Inside <code>setup()</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> What does <code>random(50, 100)</code> give you?</p>
+<ol class="quiz-opts">
+<li data-explain="It&#x27;s not a coin flip between the two — it picks from the whole range.">Either exactly 50 or exactly 100</li>
+<li data-correct="" data-explain="You get a decimal like 73.281 somewhere in that range — a new one every time you call it.">A random decimal number between 50 and 100</li>
+<li data-explain="With two arguments, the first is the minimum and the second is the maximum.">A random whole number between 0 and 50</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Build a sketch where a circle starts small and grows: declare the variable first, make the canvas, then every frame clear the background, draw the circle, and <em>then</em> make it a bit bigger. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>let size = 10;
+function setup() {
+  createCanvas(400, 400);
+}
+function draw() {
+  background(220);
+  ellipse(200, 200, size, size);
+  size = size + 1;
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <a href="chapter01.html"><span class="label">← Previous</span><span class="title">Ch. 1: Getting Started</span></a>

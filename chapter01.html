@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -438,7 +440,7 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 
 <p>Everything in p5.js happens on a <strong>canvas</strong>, which is just a rectangle of pixels. You create one inside a special function called <code>setup()</code>, which runs once when the program starts.</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
 }</code></pre>
 
@@ -477,7 +479,7 @@ This flipped y-axis trips up <em>everybody</em> at first. When you mean "higher 
 
 <p>Each one takes some numbers and draws something on the canvas. Let's put a circle right in the middle of a 400×400 canvas:</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
   <span class="function">ellipse</span>(<span class="number">200</span>, <span class="number">200</span>, <span class="number">100</span>, <span class="number">100</span>);
 }</code></pre>
@@ -507,7 +509,7 @@ By default, <code>rect()</code> anchors at its <strong>top-left corner</strong>,
 </div>
 <p class="video-caption">Coding Train 1.3 — Shapes &amp; drawing</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
   <span class="function">background</span>(<span class="number">20</span>, <span class="number">20</span>, <span class="number">40</span>);     <span class="comment">// dark navy</span>
   <span class="function">stroke</span>(<span class="number">255</span>);                 <span class="comment">// white outline</span>
@@ -537,7 +539,7 @@ p5 paints shapes in the order you call them, like layers of paint. A <code>backg
 </div>
 <p class="video-caption">Coding Train 1.4 — Color</p>
 
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
 }
 
@@ -585,7 +587,7 @@ Recreate the flag of your school, your country, or your favorite sports team usi
 <div class="exercise">
 <span class="callout-title">Exercise 1.3 — Predict the order</span>
 Before running it, write down on paper what this sketch will look like. Then run it. Were you right?
-<pre><code><span class="keyword">function</span> <span class="function">setup</span>() {
+<pre class="runnable"><code><span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">300</span>, <span class="number">300</span>);
   <span class="function">background</span>(<span class="number">200</span>);
   <span class="function">fill</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>);
@@ -602,6 +604,45 @@ Look up <code>arc()</code> and <code>quad()</code> in the <a href="https://p5js.
 
 <p>That's Chapter 1! You've got shapes, color, coordinates, and the <code>setup()</code>/<code>draw()</code> heartbeat. In the next chapter, we're going to plug variables into that heartbeat — and your sketches will finally start to move.</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> On a p5.js canvas, where is the point <code>(0, 0)</code>?</p>
+<ol class="quiz-opts">
+<li data-explain="That&#x27;s how math class does it. p5.js puts the origin somewhere else entirely.">The center of the canvas</li>
+<li data-correct="" data-explain="The origin is the top-left corner, and y gets bigger as you move down the screen.">The top-left corner</li>
+<li data-explain="Close — that&#x27;s a standard math graph. In p5.js the origin is at the top, and y increases downward.">The bottom-left corner</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> Which function runs over and over, about 60 times per second?</p>
+<ol class="quiz-opts">
+<li data-explain="setup() runs exactly once, at the very start. Something else is the heartbeat."><code>setup()</code></li>
+<li data-explain="createCanvas() just makes the canvas — you usually call it once inside setup()."><code>createCanvas()</code></li>
+<li data-correct="" data-explain="draw() loops roughly 60 times per second. That repeating loop is what makes animation possible."><code>draw()</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> Your sketch draws a circle, then calls <code>background(220)</code> as the <em>last</em> line of <code>draw()</code>. What do you see?</p>
+<ol class="quiz-opts">
+<li data-explain="Order matters! p5 paints in the order you call things, like layers of paint.">A circle on a gray background</li>
+<li data-correct="" data-explain="background() paints over everything drawn before it. Call it first, not last.">Just a gray canvas — no circle</li>
+<li data-explain="No error — the code runs fine. It just paints the background on top of your circle, hiding it.">An error message</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines into a complete sketch that makes a 400×400 canvas, then (every frame) clears the background <em>before</em> drawing a circle at the center. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>function setup() {
+  createCanvas(400, 400);
+}
+function draw() {
+  background(220);
+  ellipse(200, 200, 80, 80);
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <span class="disabled"><span class="label">Previous</span><span class="title">Start of book</span></span>

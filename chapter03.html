@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -497,7 +499,7 @@ JavaScript's <code>==</code> tries to convert types before comparing, which lead
 
 <p>Here's the canonical example. We have a ball with a position <code>x</code> and a speed <code>xspeed</code>. Every frame, we add the speed to the position. When the ball hits the edge of the canvas, we <strong>reverse</strong> the speed. That's bouncing.</p>
 
-<pre><code><span class="keyword">let</span> x = <span class="number">200</span>;
+<pre class="runnable"><code><span class="keyword">let</span> x = <span class="number">200</span>;
 <span class="keyword">let</span> y = <span class="number">200</span>;
 <span class="keyword">let</span> xspeed = <span class="number">3</span>;
 <span class="keyword">let</span> yspeed = <span class="number">2</span>;
@@ -629,6 +631,44 @@ Use a boolean called <code>lightOn</code>. When the mouse is pressed, toggle it.
 
 <p>You've taught your sketch how to think. Up next: <strong>loops</strong> — how to teach it to repeat itself. Without loops, we couldn't draw a grid of 400 squares without typing <code>rect()</code> 400 times. With loops? One line.</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> What's the difference between <code>=</code> and <code>==</code>?</p>
+<ol class="quiz-opts">
+<li data-explain="They look similar but do totally different jobs — mixing them up is a classic bug.">They're interchangeable</li>
+<li data-correct="" data-explain="x = 5 &lt;em&gt;stores&lt;/em&gt; 5 in x. x == 5 &lt;em&gt;asks&lt;/em&gt; whether x equals 5 and answers true or false."><code>=</code> assigns a value; <code>==</code> compares two values</li>
+<li data-explain="Both work on any type. The difference is assigning versus comparing."><code>=</code> is for numbers; <code>==</code> is for strings</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> A ball moves with <code>x = x + speed;</code>. How do you make it bounce when it hits an edge?</p>
+<ol class="quiz-opts">
+<li data-explain="That teleports the ball back to the left edge — more of a loop than a bounce.">Set <code>x = 0;</code></li>
+<li data-correct="" data-explain="Multiplying speed by -1 reverses its direction: positive becomes negative and back again.">Flip the sign: <code>speed = speed * -1;</code></li>
+<li data-explain="That freezes everything. A bounce means reversing direction, not stopping.">Stop the sketch with <code>noLoop();</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> When is <code>(x &gt; 100 &amp;&amp; x &lt; 200)</code> true?</p>
+<ol class="quiz-opts">
+<li data-explain="That describes || (or). The &amp;&amp; operator is stricter.">When x is greater than 100 <em>or</em> less than 200</li>
+<li data-correct="" data-explain="&amp;&amp; means AND: every condition has to be true. Here that traps x between 100 and 200.">Only when <em>both</em> parts are true — x is between 100 and 200</li>
+<li data-explain="&amp;gt; and &amp;lt; don&#x27;t include the endpoints — and &amp;&amp; is about both conditions holding at once.">Only when x is exactly 100 or exactly 200</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines so the sketch stores whether it's hot (above 90), then fills red if it is, and blue otherwise. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>let hot = temperature &gt; 90;
+if (hot) {
+  fill(255, 0, 0);
+} else {
+  fill(0, 0, 255);
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <a href="chapter02.html"><span class="label">← Previous</span><span class="title">Ch. 2: Variables</span></a>

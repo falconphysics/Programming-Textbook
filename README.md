@@ -16,7 +16,9 @@ Built by a high-school Director of Instructional Technology / AP CSA teacher usi
 6. **Objects** — ES6 classes (`constructor`, methods, `this`)
 7. **Arrays** — arrays of objects, mouse interaction, `splice()` with backward loops
 
-Each chapter is a single, self-contained HTML file with all CSS inlined. No build step is required to view it — just open the file in a browser, or host the folder on any static web host.
+Each chapter is a single HTML file with all CSS inlined, plus one small shared folder (`assets/`) that powers the interactive features. No build step is required — just open `index.html` in a browser, or host the folder on any static web host.
+
+**Interactive features** (added 2026): every complete sketch in the book has a **▶ Run** button that executes it live on the page in a sandboxed iframe, an **✎ Edit** button that lets students modify the code and re-run it, and a **↺ Reset** that restores the original. Each chapter ends with a **Check Your Understanding** section: three multiple-choice questions with instant explanatory feedback, plus a Parsons Problem (a scrambled program students reorder with drag-and-drop or tap-friendly ▲▼ buttons — works great on iPads). Everything degrades gracefully: with JavaScript disabled, the pages read as a normal static textbook.
 
 ---
 
@@ -42,15 +44,13 @@ That's it. No server required.
    ```
    your-repo/
    ├── index.html
-   ├── chapter01.html
-   ├── chapter02.html
-   ├── chapter03.html
-   ├── chapter04.html
-   ├── chapter05.html
-   ├── chapter06.html
-   ├── chapter07.html
+   ├── chapter01.html … chapter07.html
+   ├── assets/
+   │   ├── interactive.css
+   │   └── interactive.js
    └── README.md
    ```
+   The `assets/` folder is required — it's what makes the Run buttons and quizzes work.
 
 3. **Turn on GitHub Pages.** In your repo, go to **Settings → Pages**, set the source to **Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, then **Save**.
 
@@ -79,19 +79,22 @@ That keeps all your styling and video embeds intact.
 
 ```
 p5js-textbook/
-├── index.html         # landing page / table of contents
-├── chapter01.html     # Chapter 1: Getting Started
-├── chapter02.html     # Chapter 2: Variables
-├── chapter03.html     # Chapter 3: Conditionals
-├── chapter04.html     # Chapter 4: Loops
-├── chapter05.html     # Chapter 5: Functions
-├── chapter06.html     # Chapter 6: Objects
-├── chapter07.html     # Chapter 7: Arrays
-├── README.md          # this file
-└── build.sh           # script used to regenerate the .zip package
+├── index.html              # landing page / table of contents
+├── chapter01.html          # Chapter 1: Getting Started
+├── chapter02.html          # Chapter 2: Variables
+├── chapter03.html          # Chapter 3: Conditionals
+├── chapter04.html          # Chapter 4: Loops
+├── chapter05.html          # Chapter 5: Functions
+├── chapter06.html          # Chapter 6: Objects
+├── chapter07.html          # Chapter 7: Arrays
+├── assets/
+│   ├── interactive.css     # styles for run/edit widgets & quizzes
+│   └── interactive.js      # live sketch runner, MC quizzes, Parsons Problems
+├── README.md               # this file
+└── build.sh                # regenerates the .zip package
 ```
 
-Each chapter file is fully self-contained — no external CSS, no external JavaScript (apart from YouTube iframe embeds for the videos). You can drop any single chapter into any other web context and it will render correctly on its own.
+Each chapter's *content and styling* is self-contained (all CSS inlined), so the pages still render correctly as plain documents anywhere. The interactive features — Run buttons, quizzes, Parsons Problems — come from the shared `assets/` folder and load progressively: if `interactive.js` is missing or JavaScript is off, the chapter is simply a static textbook page. Live sketches load **p5.js v1.11.3 from the jsDelivr CDN** inside a sandboxed iframe at the moment a student presses Run, so students need an internet connection to run code (but not to read).
 
 ---
 
@@ -118,6 +121,42 @@ These are the consistent CSS classes used across every chapter, in case you want
 - `.chapter-nav` — sticky header nav (prev / contents / next)
 - `.chapter-footer` — large prev / next cards at the bottom of each chapter
 - `.toc-grid` / `.toc-card` — used on `index.html`
+
+### Interactive widgets (enhanced by `assets/interactive.js`)
+
+**Runnable sketch** — add `class="runnable"` to any `<pre>` whose code is a complete p5 sketch:
+```html
+<pre class="runnable"><code>…highlighted sketch code…</code></pre>
+```
+The plain source is recovered from the highlighted markup's text content, so nothing is duplicated. If the sketch depends on a class or function shown in a *different* block, give that block an `id` and reference it:
+```html
+<pre id="def-ball-class"><code>class Ball { … }</code></pre>
+<pre class="runnable" data-include="#def-ball-class"><code>let b = new Ball(); …</code></pre>
+```
+The included code is silently prepended when the student presses Run (and the widget's corner label changes to "Runs with the code above"). Runtime errors appear inside the output frame with an approximate line number — deliberately, so buggy example code becomes a live demo.
+
+**Multiple-choice question:**
+```html
+<div class="quiz-card quiz-mc">
+  <p class="quiz-q">Question?</p>
+  <ol class="quiz-opts">
+    <li data-explain="Why this is wrong.">Wrong answer</li>
+    <li data-correct data-explain="Why this is right.">Right answer</li>
+  </ol>
+</div>
+```
+Wrong answers show their explanation and allow retries; the correct answer locks the question.
+
+**Parsons Problem** — put the lines in the **correct** order inside a hidden source block; they're shuffled on page load:
+```html
+<div class="quiz-card parsons">
+  <p class="quiz-q">Arrange the lines to…</p>
+  <pre class="parsons-source" hidden><code>line one
+line two
+line three</code></pre>
+</div>
+```
+Students reorder with ▲▼ buttons (touch-friendly) or drag-and-drop, then press **Check my answer** for per-line feedback. Write prompts so only one order is valid (e.g., "starting with a line at x = 0").
 
 All chapters use the same fonts (Iowan Old Style / Palatino for body, Helvetica Neue / Inter for sans, JetBrains Mono / Fira Code for code) and a shared p5-pink (`#ed225d`) accent color.
 

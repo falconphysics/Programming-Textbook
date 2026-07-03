@@ -402,6 +402,8 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 }
 
 </style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
 </head>
 <body>
 <nav class="chapter-nav">
@@ -438,7 +440,7 @@ th { background: rgba(0,0,0,0.03); font-weight: 700; }
 
 <p>Here's a <code>Ball</code> class. Read the whole thing first, then we'll break it down.</p>
 
-<pre><code><span class="keyword">class</span> <span class="class-name">Ball</span> {
+<pre id="def-ball-class"><code><span class="keyword">class</span> <span class="class-name">Ball</span> {
   <span class="function">constructor</span>(x, y, diameter) {
     <span class="keyword">this</span>.x = x;
     <span class="keyword">this</span>.y = y;
@@ -491,7 +493,7 @@ The single most common bug in OOP code. If you write <code>x += xspeed</code> in
 
 <p>Defining a class doesn't create anything yet — it's just a blueprint. To <em>actually make a ball</em>, you use the <code>new</code> keyword:</p>
 
-<pre><code><span class="keyword">let</span> ball;
+<pre class="runnable" data-include="#def-ball-class"><code><span class="keyword">let</span> ball;
 
 <span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
@@ -516,7 +518,7 @@ The single most common bug in OOP code. If you write <code>x += xspeed</code> in
 
 <p>Here's where it gets <em>really</em> good. Now that you have a class, making fifty balls is just fifty calls to <code>new Ball(...)</code>. Each one has its own x, y, and speed. They all know how to move and draw themselves.</p>
 
-<pre><code><span class="keyword">let</span> ball1, ball2, ball3;
+<pre class="runnable" data-include="#def-ball-class"><code><span class="keyword">let</span> ball1, ball2, ball3;
 
 <span class="keyword">function</span> <span class="function">setup</span>() {
   <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
@@ -599,6 +601,47 @@ Add a method <code>followMouse()</code> to the Ball class that moves the ball to
 
 <p>Classes — done. You now have the conceptual core of object-oriented programming, the same model used in every major programming language. In our final chapter, we'll learn to keep <strong>collections</strong> of these objects with arrays — and that's when our sketches really come alive.</p>
 
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> Inside a class's method, what does <code>this</code> refer to?</p>
+<ol class="quiz-opts">
+<li data-explain="The class is the blueprint. this points at something more specific.">The class definition itself</li>
+<li data-correct="" data-explain="If you call ball2.move(), then inside move(), this.x means ball2&#x27;s x — each instance keeps its own data.">The particular object whose method is running right now</li>
+<li data-explain="this isn&#x27;t about creation order — it&#x27;s about which object the method was called on.">The most recently created object</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> When does the <code>constructor()</code> run?</p>
+<ol class="quiz-opts">
+<li data-explain="Defining a class runs nothing. The constructor waits for a specific keyword.">Once, when the page loads</li>
+<li data-explain="The constructor is a one-time setup for each object, not a loop.">Every frame, like <code>draw()</code></li>
+<li data-correct="" data-explain="new Ball() runs the constructor once for that ball, setting up its starting values. Three new calls, three constructor runs.">Each time you create an object with <code>new</code></li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> What's the relationship between a class and an object?</p>
+<ol class="quiz-opts">
+<li data-explain="They&#x27;re related, but one is a plan and one is a real thing built from that plan.">They're two words for the same thing</li>
+<li data-correct="" data-explain="One Ball class can stamp out ball1, ball2, ball3 — each a separate object with its own x, y, and speed.">A class is the blueprint; an object is an actual instance built from it</li>
+<li data-explain="It&#x27;s the other way around: the class describes, the objects are the instances.">An object is the blueprint; a class is a copy of it</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines into a sketch that creates one <code>Ball</code> object, makes the canvas, and every frame clears the background, <em>moves</em> the ball, then <em>shows</em> it. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>let b = new Ball();
+function setup() {
+  createCanvas(400, 400);
+}
+function draw() {
+  background(220);
+  b.move();
+  b.show();
+}</code></pre>
+</div>
+</section>
 </main>
 <footer class="chapter-footer wrap">
   <a href="chapter05.html"><span class="label">← Previous</span><span class="title">Ch. 5: Functions</span></a>
