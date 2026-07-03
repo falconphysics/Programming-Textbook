@@ -6,6 +6,13 @@
    ============================================================ */
 
 /* ---------- Live, runnable sketches ---------- */
+
+/* The hidden attribute must always win, even over display rules
+   below (e.g. .sketch-editor { display: block }). Without this,
+   Reset leaves the editor visible under the highlighted code. */
+.sketch-widget [hidden],
+.quiz-section [hidden] { display: none !important; }
+
 .sketch-widget {
   margin: 16px 0 24px;
   border-radius: 10px;
