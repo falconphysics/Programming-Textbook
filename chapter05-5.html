@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter 5.5: Images &amp; Sounds — p5.js Textbook</title>
+<style>
+/* ============================================================
+   p5.js Textbook — shared inline stylesheet
+   ============================================================ */
+:root {
+  --bg: #fdfaf3;
+  --bg-panel: #ffffff;
+  --ink: #1a1a1a;
+  --ink-soft: #4a4a4a;
+  --accent: #ed225d;        /* p5 pink */
+  --accent-dark: #b8174a;
+  --rule: #e8e2d3;
+  --code-bg: #1e1e2e;
+  --code-ink: #f5f5f5;
+
+  --kw: #c084fc;            /* keyword purple */
+  --fn: #60a5fa;            /* function blue */
+  --num: #fb923c;           /* number orange */
+  --com: #9ca3af;           /* comment gray */
+  --str: #86efac;           /* string green */
+  --cls: #fde047;           /* class-name yellow */
+
+  --tip-bg: #e8f5e9;
+  --tip-bd: #66bb6a;
+  --alert-bg: #fff8e1;
+  --alert-bd: #ffb300;
+  --err-bg: #ffebee;
+  --err-bd: #e53935;
+  --ex-bg: #e3f2fd;
+  --ex-bd: #1e88e5;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --sans: "Helvetica Neue", "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(237,34,93,0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(96,165,250,0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+.wrap {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Top nav ---------- */
+.chapter-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(253,250,243,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 14px;
+}
+.chapter-nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  gap: 12px;
+}
+.chapter-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.chapter-nav a:hover { background: rgba(237,34,93,0.1); color: var(--accent-dark); }
+.chapter-nav .home {
+  font-weight: 700;
+  color: var(--accent);
+}
+.chapter-nav .nav-prev::before { content: "← "; }
+.chapter-nav .nav-next::after  { content: " →"; }
+.chapter-nav .nav-disabled { color: #bbb; pointer-events: none; }
+
+/* ---------- Chapter header ---------- */
+.chapter-header {
+  padding: 56px 0 32px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 36px;
+}
+.chapter-eyebrow {
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.chapter-title {
+  font-family: var(--sans);
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+}
+.chapter-lede {
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  margin: 0;
+  max-width: 60ch;
+}
+
+/* ---------- Typography ---------- */
+h2 {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 1.8rem;
+  margin: 48px 0 12px;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 80px;
+}
+h2 .anchor {
+  opacity: 0;
+  text-decoration: none;
+  color: var(--accent);
+  margin-left: 8px;
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+h2:hover .anchor { opacity: 1; }
+
+h3 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 32px 0 10px;
+}
+
+p { margin: 0 0 16px; }
+a { color: var(--accent-dark); }
+a:hover { color: var(--accent); }
+
+strong { font-weight: 700; }
+em { font-style: italic; }
+
+ul, ol { margin: 0 0 16px; padding-left: 1.5em; }
+li { margin: 6px 0; }
+
+/* ---------- Inline code & code blocks ---------- */
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  background: rgba(237,34,93,0.08);
+  color: var(--accent-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 1.55;
+  padding: 18px 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 16px 0 24px;
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.keyword    { color: var(--kw); font-weight: 600; }
+.function   { color: var(--fn); }
+.number     { color: var(--num); }
+.comment    { color: var(--com); font-style: italic; }
+.string     { color: var(--str); }
+.class-name { color: var(--cls); font-weight: 600; }
+
+/* ---------- Video container ---------- */
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;       /* 16:9 */
+  margin: 20px 0 28px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  background: #000;
+}
+.video-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.video-caption {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: -16px 0 24px;
+  text-align: center;
+}
+
+/* ---------- Callouts ---------- */
+.tip, .alert, .error-example, .exercise {
+  padding: 16px 20px 16px 52px;
+  border-radius: 8px;
+  margin: 20px 0;
+  position: relative;
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+.tip::before, .alert::before, .error-example::before, .exercise::before {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  font-size: 22px;
+  line-height: 1;
+}
+.tip            { background: var(--tip-bg);   border-left: 4px solid var(--tip-bd); }
+.tip::before    { content: "💡"; }
+.alert          { background: var(--alert-bg); border-left: 4px solid var(--alert-bd); }
+.alert::before  { content: "⚠️"; }
+.error-example  { background: var(--err-bg);   border-left: 4px solid var(--err-bd); }
+.error-example::before { content: "🐛"; }
+.exercise       { background: var(--ex-bg);    border-left: 4px solid var(--ex-bd); }
+.exercise::before { content: "✏️"; }
+
+.callout-title {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-family: var(--sans);
+}
+
+.tip code, .alert code, .error-example code, .exercise code {
+  background: rgba(0,0,0,0.06);
+  color: inherit;
+}
+
+/* ---------- Tables ---------- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0 24px;
+  font-family: var(--sans);
+  font-size: 15px;
+}
+th, td {
+  border-bottom: 1px solid var(--rule);
+  padding: 10px 12px;
+  text-align: left;
+}
+th { background: rgba(0,0,0,0.03); font-weight: 700; }
+
+/* ---------- Footer nav ---------- */
+.chapter-footer {
+  margin-top: 64px;
+  padding: 28px 0 48px;
+  border-top: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--sans);
+}
+.chapter-footer a {
+  text-decoration: none;
+  color: var(--ink);
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  flex: 1;
+  background: var(--bg-panel);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.chapter-footer a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: var(--accent);
+}
+.chapter-footer .label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.chapter-footer .title {
+  font-weight: 700;
+  font-size: 17px;
+}
+.chapter-footer .next { text-align: right; }
+.chapter-footer .disabled { opacity: 0.4; pointer-events: none; }
+
+/* ---------- Index page extras ---------- */
+.toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 32px 0;
+}
+.toc-card {
+  display: block;
+  padding: 22px;
+  background: var(--bg-panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.toc-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 4px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s;
+}
+.toc-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  border-color: var(--accent);
+}
+.toc-card:hover::before { transform: scaleX(1); }
+.toc-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.toc-title {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin: 6px 0 8px;
+}
+.toc-desc {
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  body { font-size: 17px; }
+  .wrap { padding: 0 18px; }
+  .chapter-nav { font-size: 13px; }
+  .chapter-nav .wrap { gap: 8px; }
+  .chapter-nav a { padding: 6px 6px; }
+  pre { font-size: 13.5px; padding: 14px; }
+  .chapter-footer { flex-direction: column; }
+  .chapter-footer .next { text-align: left; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  body { background: white; color: black; font-size: 11pt; }
+  .chapter-nav, .chapter-footer, .video-container { display: none; }
+  pre { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  h2, h3 { page-break-after: avoid; }
+  .tip, .alert, .error-example, .exercise {
+    border: 1px solid #999; background: #f5f5f5 !important; color: black;
+  }
+  a { color: black; text-decoration: underline; }
+}
+
+</style>
+<link rel="stylesheet" href="assets/interactive.css">
+<script defer src="assets/interactive.js"></script>
+</head>
+<body>
+<nav class="chapter-nav">
+  <div class="wrap">
+    <a class="home" href="index.html">p5.js Textbook</a>
+    <div class="nav-links">
+      <a class="nav-prev" href="chapter05.html">Ch. 5</a>
+      <a href="index.html">Contents</a>
+      <a class="nav-next" href="chapter06.html">Ch. 6</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap">
+  <header class="chapter-header">
+    <p class="chapter-eyebrow">Chapter 5.5</p>
+    <h1 class="chapter-title">Images &amp; Sounds</h1>
+    <p class="chapter-lede">Sprites, backgrounds, sound effects, and music — plus the two keywords that make loading files work.</p>
+  </header>
+
+<p>Up to now, every pixel on your canvas has come from shapes you drew with code. That's powerful, but real games and art pieces also use <strong>pictures</strong> and <strong>sound</strong>: a hand-drawn character, a photo for a background, a <em>pop</em> when you click, music that loops. This short chapter shows you how to bring those files into a sketch.</p>
+
+<p>Why is it "5.5"? Because it leans on Chapter 5. Loading a file needs a special kind of <code>setup()</code> function, and sounds usually play from functions like <code>mousePressed()</code>. You know functions now — so you're ready.</p>
+
+<div class="tip">
+<span class="callout-title">This book uses p5.js 2.x</span>
+Every example here runs on <strong>p5.js 2.4</strong>, the newest version. Loading files changed in p5.js 2.0, so if you find an older tutorial or video that uses a function called <code>preload()</code>, that's the old p5.js 1.x way. It won't work here — use the <code>async</code>/<code>await</code> style this chapter teaches. In the <a href="https://editor.p5js.org/" target="_blank" rel="noopener">p5.js Web Editor</a>, check that your sketch is set to a 2.x version.
+</div>
+
+<h2 id="media-files">Where your files live <a class="anchor" href="#media-files">#</a></h2>
+
+<p>A sketch can only use a file it can <em>reach</em>. In the p5.js Web Editor, that means uploading the file into your sketch: open the file list beside your code, use the <strong>+</strong> menu to make a folder called <code>assets</code>, then upload your picture or sound into it. On a website, it means putting the file in a folder next to your HTML page.</p>
+
+<p>Then you refer to the file by its <strong>path</strong> — the folder and filename, in quotes:</p>
+
+<pre><code><span class="string">'assets/rocket.png'</span>        <span class="comment">// a file named rocket.png inside a folder named assets</span></code></pre>
+
+<p>All the examples in this book load files from the textbook's own <code>assets/media/</code> folder, so you'll see paths like <code>'assets/media/rocket.png'</code>.</p>
+
+<table>
+  <thead><tr><th>Type</th><th>Use it for</th><th>Good to know</th></tr></thead>
+  <tbody>
+    <tr><td><strong>PNG</strong></td><td>Characters, icons, sprites</td><td>Supports <em>transparency</em> — no white box around your character.</td></tr>
+    <tr><td><strong>JPG</strong></td><td>Photos and backgrounds</td><td>Smaller files, but no transparency.</td></tr>
+    <tr><td><strong>GIF</strong></td><td>Simple animations</td><td>p5 plays animated GIFs automatically.</td></tr>
+    <tr><td><strong>MP3</strong></td><td>Sound effects and music</td><td>Works in every browser. Your best default.</td></tr>
+    <tr><td><strong>WAV</strong></td><td>Short sound effects</td><td>Works everywhere, but files are much bigger.</td></tr>
+  </tbody>
+</table>
+
+<div class="alert">
+<span class="callout-title">Filenames are case-sensitive</span>
+<code>'Rocket.PNG'</code> and <code>'rocket.png'</code> are <em>different files</em> to a web server. Your sketch might work on your computer and break once it's online. Easy habit: name every file in lowercase, with no spaces.
+</div>
+
+<h2 id="async-await">Loading takes time: async and await <a class="anchor" href="#async-await">#</a></h2>
+
+<p>Here's the new idea. Drawing a circle happens instantly. Loading a file doesn't — the browser has to go <em>get</em> it, and that might take a split second or a few seconds on slow Wi-Fi. Your code needs to <strong>wait</strong> for the file before using it.</p>
+
+<p>Think of ordering at a restaurant counter. You order, and they hand you a buzzer. The buzzer isn't your food — it's a <em>promise</em> that food is coming. You wait for it to buzz, then you eat. In JavaScript, <code>loadImage()</code> hands you the buzzer, and <code>await</code> means "wait for the buzz."</p>
+
+<pre><code><span class="keyword">let</span> rocket;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+}</code></pre>
+
+<p>Two new keywords, and they always come as a pair:</p>
+
+<ul>
+  <li><strong><code>async</code></strong> goes in front of <code>function setup()</code>. It marks setup as a function that's <em>allowed to wait</em>.</li>
+  <li><strong><code>await</code></strong> goes in front of <code>loadImage(...)</code>. It pauses <code>setup()</code> right there until the file has arrived. Then <code>rocket</code> holds the actual image.</li>
+</ul>
+
+<p>p5 is smart about this: <code>draw()</code> doesn't start until <code>setup()</code> has completely finished. So by the time <code>draw()</code> runs, every file you <code>await</code>ed is ready to use.</p>
+
+<div class="alert">
+<span class="callout-title">No await without async</span>
+If you write <code>await</code> inside a function that isn't marked <code>async</code>, the sketch won't run at all. You'll get an error like <em>await is only valid in async functions</em>. The fix is the word <code>async</code> in front of <code>function setup()</code>.
+</div>
+
+<div class="video-container">
+  <iframe src="https://www.youtube.com/embed/25omXt_OjD4" title="p5.js 2.0: Loading Data (Images, APIs, JSON)" allowfullscreen></iframe>
+</div>
+<p class="video-caption">Coding Train — p5.js 2.0: Loading Data (Images, APIs, JSON). For more on the keywords themselves, see <a href="https://thecodingtrain.com/tracks/p5js-2.0/p5js-2.0/async-await/" target="_blank" rel="noopener">p5.js 2.0: async and await</a>.</p>
+
+<h2 id="drawing-images">Drawing an image <a class="anchor" href="#drawing-images">#</a></h2>
+
+<p>Once the image is loaded, <code>image()</code> draws it. The simplest version takes the image and an <em>x</em>, <em>y</em> position — the image's <strong>top-left corner</strong>, just like <code>rect()</code>.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+  <span class="function">image</span>(rocket, <span class="number">150</span>, <span class="number">120</span>);
+}</code></pre>
+
+<p>Every loaded image knows its own size: <code>rocket.width</code> and <code>rocket.height</code>. Add two more numbers to <code>image()</code> to draw it at a different size: <code>image(img, x, y, w, h)</code>. Multiplying <em>both</em> the width and height by the same amount keeps the image from looking squished.</p>
+
+<p>This sketch combines that with a loop from Chapter 4 to draw four rockets, each bigger than the last. Notice it draws everything inside <code>setup()</code> — there's no <code>draw()</code> at all, because nothing moves.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+
+  <span class="keyword">let</span> x = <span class="number">10</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i &lt;= <span class="number">4</span>; i++) {
+    <span class="keyword">let</span> w = rocket.width * i * <span class="number">0.35</span>;
+    <span class="keyword">let</span> h = rocket.height * i * <span class="number">0.35</span>;
+    <span class="function">image</span>(rocket, x, <span class="number">380</span> - h, w, h);
+    x = x + w + <span class="number">10</span>;
+  }
+}</code></pre>
+
+<div class="tip">
+<span class="callout-title">Try it</span>
+Press <strong>Edit</strong> and change <code>0.35</code> to <code>0.2</code>. Then try making only the width change (<code>rocket.width * i * 0.35</code> but a fixed height) and see what a squished rocket looks like.
+</div>
+
+<h2 id="image-mode">Centering images and following the mouse <a class="anchor" href="#image-mode">#</a></h2>
+
+<p>Just like <code>rectMode(CENTER)</code>, there's <strong><code>imageMode(CENTER)</code></strong>. After you call it, the <em>x</em>, <em>y</em> you give <code>image()</code> becomes the <strong>center</strong> of the picture. That's exactly what you want when an image follows the mouse.</p>
+
+<p>This sketch also loads a second image for the background. Drawing a background image that fills the whole canvas does the same job as <code>background()</code> — it wipes the old frame away.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+<span class="keyword">let</span> stars;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">600</span>, <span class="number">400</span>);
+  stars = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/stars.jpg'</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+  <span class="function">imageMode</span>(<span class="function">CENTER</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">image</span>(stars, <span class="function">width</span> / <span class="number">2</span>, <span class="function">height</span> / <span class="number">2</span>);   <span class="comment">// the background</span>
+  <span class="function">image</span>(rocket, <span class="function">mouseX</span>, <span class="function">mouseY</span>);          <span class="comment">// the rocket follows you</span>
+}</code></pre>
+
+<p>Move your mouse over the sketch. Notice there's no white box around the rocket — the PNG's transparent pixels let the stars show through.</p>
+
+<h2 id="tint">Tinting images <a class="anchor" href="#tint">#</a></h2>
+
+<p><strong><code>tint()</code></strong> is like <code>fill()</code> for images: it changes the color of every image drawn after it. One number between 0 and 255 after the color makes the image see-through. <strong><code>noTint()</code></strong> turns tinting off again.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+<span class="keyword">let</span> stars;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">600</span>, <span class="number">400</span>);
+  stars = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/stars.jpg'</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+  <span class="function">imageMode</span>(<span class="function">CENTER</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">image</span>(stars, <span class="function">width</span> / <span class="number">2</span>, <span class="function">height</span> / <span class="number">2</span>);
+
+  <span class="function">tint</span>(<span class="number">255</span>, <span class="number">140</span>, <span class="number">140</span>);        <span class="comment">// reddish</span>
+  <span class="function">image</span>(rocket, <span class="number">120</span>, <span class="number">200</span>);
+
+  <span class="function">tint</span>(<span class="number">140</span>, <span class="number">255</span>, <span class="number">180</span>);        <span class="comment">// greenish</span>
+  <span class="function">image</span>(rocket, <span class="number">260</span>, <span class="number">200</span>);
+
+  <span class="function">tint</span>(<span class="number">255</span>, <span class="number">90</span>);              <span class="comment">// full color, but see-through</span>
+  <span class="function">image</span>(rocket, <span class="number">400</span>, <span class="number">200</span>);
+
+  <span class="function">noTint</span>();                   <span class="comment">// back to normal</span>
+  <span class="function">image</span>(rocket, <span class="number">520</span>, <span class="number">200</span>);
+}</code></pre>
+
+<div class="alert">
+<span class="callout-title">tint() sticks around</span>
+Just like <code>fill()</code>, a <code>tint()</code> stays on for <em>everything</em> drawn after it — including your background image on the next frame. If your whole sketch suddenly turns pink, look for a missing <code>noTint()</code>.
+</div>
+
+<h2 id="moving-images">Making an image move <a class="anchor" href="#moving-images">#</a></h2>
+
+<p>An image is drawn at whatever numbers you give it — so put <strong>variables</strong> there and change them, exactly like the moving circles from Chapters 2 and 3. Here, the rocket flies upward, and an <code>if</code> statement sends it back to the bottom once it's off the screen.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+<span class="keyword">let</span> stars;
+<span class="keyword">let</span> x = <span class="number">300</span>;
+<span class="keyword">let</span> y = <span class="number">400</span>;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">600</span>, <span class="number">400</span>);
+  stars = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/stars.jpg'</span>);
+  rocket = <span class="keyword">await</span> <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+  <span class="function">imageMode</span>(<span class="function">CENTER</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">image</span>(stars, <span class="function">width</span> / <span class="number">2</span>, <span class="function">height</span> / <span class="number">2</span>);
+  <span class="function">image</span>(rocket, x, y);
+  y = y - <span class="number">3</span>;
+
+  <span class="comment">// Off the top? Start again at the bottom, somewhere new.</span>
+  <span class="keyword">if</span> (y &lt; -rocket.height) {
+    y = <span class="function">height</span> + rocket.height;
+    x = <span class="function">random</span>(<span class="number">50</span>, <span class="function">width</span> - <span class="number">50</span>);
+  }
+}</code></pre>
+
+<h2 id="sounds">Adding sound with p5.sound <a class="anchor" href="#sounds">#</a></h2>
+
+<p>Sound lives in a separate add-on library called <strong>p5.sound</strong>. In this textbook it loads automatically whenever your sketch uses sound. In the p5.js Web Editor, make sure the p5.sound library is turned on for your sketch. On your own web page, add a second <code>&lt;script&gt;</code> tag right after p5.js:</p>
+
+<pre><code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5@2.4.0/lib/p5.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<p>Loading a sound works <em>exactly</em> like loading an image — <code>await</code> inside <code>async function setup()</code>:</p>
+
+<pre><code>pop = <span class="keyword">await</span> <span class="function">loadSound</span>(<span class="string">'assets/media/pop.mp3'</span>);</code></pre>
+
+<p>There's one big rule for sound on the web: <strong>browsers won't play any sound until the person interacts with the page.</strong> That rule exists so websites can't blast audio at you the moment they open. So we play sounds from functions that run when the user does something — like <code>mousePressed()</code>, which p5 calls every time you click.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> pop;
+<span class="keyword">let</span> ringX = <span class="number">200</span>;
+<span class="keyword">let</span> ringY = <span class="number">200</span>;
+<span class="keyword">let</span> ringSize = <span class="number">0</span>;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  pop = <span class="keyword">await</span> <span class="function">loadSound</span>(<span class="string">'assets/media/pop.mp3'</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+  <span class="function">noStroke</span>();
+  <span class="function">fill</span>(<span class="number">255</span>);
+  <span class="function">textAlign</span>(<span class="function">CENTER</span>);
+  <span class="function">text</span>(<span class="string">'Click anywhere!'</span>, <span class="function">width</span> / <span class="number">2</span>, <span class="number">30</span>);
+
+  <span class="function">noFill</span>();
+  <span class="function">stroke</span>(<span class="number">237</span>, <span class="number">34</span>, <span class="number">93</span>);
+  <span class="function">strokeWeight</span>(<span class="number">4</span>);
+  <span class="function">circle</span>(ringX, ringY, ringSize);
+  ringSize = ringSize + <span class="number">6</span>;
+}
+
+<span class="keyword">function</span> <span class="function">mousePressed</span>() {
+  pop.<span class="function">play</span>();
+  ringX = <span class="function">mouseX</span>;
+  ringY = <span class="function">mouseY</span>;
+  ringSize = <span class="number">0</span>;
+}</code></pre>
+
+<p>Press <strong>Run</strong>, then click inside the sketch. (Your volume needs to be up!)</p>
+
+<p><code>pop.play()</code> has a dot in the middle. You can read it as "hey <code>pop</code>, play yourself." The sound variable comes with its own built-in commands. You'll learn exactly how that works in Chapter 6.</p>
+
+<h2 id="controlling-sound">Playing, stopping, and looping <a class="anchor" href="#controlling-sound">#</a></h2>
+
+<p>A loaded sound comes with these commands:</p>
+
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>sound.play()</code></td><td>Starts playing</td></tr>
+    <tr><td><code>sound.stop()</code></td><td>Stops and rewinds to the beginning</td></tr>
+    <tr><td><code>sound.pause()</code></td><td>Stops, but remembers where it was</td></tr>
+    <tr><td><code>sound.isPlaying()</code></td><td>Gives back <code>true</code> or <code>false</code> — great inside an <code>if</code></td></tr>
+    <tr><td><code>sound.loop(true)</code></td><td>Turns on repeating, so it starts over when it ends</td></tr>
+    <tr><td><code>sound.amp(0.5)</code></td><td>Sets the volume, from <code>0</code> (silent) to <code>1</code> (full)</td></tr>
+    <tr><td><code>sound.rate(1.5)</code></td><td>Plays faster and higher (<code>0.5</code> is slower and lower)</td></tr>
+  </tbody>
+</table>
+
+<p>This one uses an <code>if</code>/<code>else</code> with <code>isPlaying()</code> so a click toggles the music on and off, and <code>map()</code> turns the mouse's height into a volume.</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> beat;
+
+<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  beat = <span class="keyword">await</span> <span class="function">loadSound</span>(<span class="string">'assets/media/beat.mp3'</span>);
+  beat.<span class="function">loop</span>(<span class="keyword">true</span>);    <span class="comment">// repeat at the end (this does NOT start it)</span>
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+
+  <span class="comment">// Top of the canvas = loud, bottom = quiet</span>
+  <span class="keyword">let</span> volume = <span class="function">constrain</span>(<span class="function">map</span>(<span class="function">mouseY</span>, <span class="function">height</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), <span class="number">0</span>, <span class="number">1</span>);
+  beat.<span class="function">amp</span>(volume);
+
+  <span class="function">noStroke</span>();
+  <span class="function">fill</span>(<span class="number">255</span>);
+  <span class="function">textAlign</span>(<span class="function">CENTER</span>);
+  <span class="keyword">if</span> (beat.<span class="function">isPlaying</span>()) {
+    <span class="function">text</span>(<span class="string">'Move up and down to change the volume'</span>, <span class="function">width</span> / <span class="number">2</span>, <span class="number">30</span>);
+    <span class="function">fill</span>(<span class="number">237</span>, <span class="number">34</span>, <span class="number">93</span>);
+    <span class="function">rect</span>(<span class="number">170</span>, <span class="function">height</span> - volume * <span class="number">300</span> - <span class="number">40</span>, <span class="number">60</span>, volume * <span class="number">300</span>);
+  } <span class="keyword">else</span> {
+    <span class="function">text</span>(<span class="string">'Click to play the beat'</span>, <span class="function">width</span> / <span class="number">2</span>, <span class="number">30</span>);
+  }
+}
+
+<span class="keyword">function</span> <span class="function">mousePressed</span>() {
+  <span class="keyword">if</span> (beat.<span class="function">isPlaying</span>()) {
+    beat.<span class="function">stop</span>();
+  } <span class="keyword">else</span> {
+    beat.<span class="function">play</span>();
+  }
+}</code></pre>
+
+<div class="alert">
+<span class="callout-title">loop(true) doesn't press play</span>
+In the newest p5.sound, <code>loop(true)</code> only switches repeating <em>on</em>. You still have to call <code>play()</code>. Older tutorials use <code>sound.loop()</code> to start music and <code>setVolume()</code> for volume — in p5.js 2.x, use <code>play()</code> and <code>amp()</code> instead.
+</div>
+
+<h2 id="oscillators">Making sounds from scratch <a class="anchor" href="#oscillators">#</a></h2>
+
+<p>You don't need a sound file to make noise. An <strong>oscillator</strong> creates a tone with code, the same way <code>ellipse()</code> creates a circle without a picture file. Its <strong>frequency</strong> — how many times per second the sound wave vibrates, measured in Hertz (Hz) — sets how high or low the note is.</p>
+
+<p>This sketch turns your mouse into a simple musical instrument. Don't worry about the word <code>new</code> on line 6 yet — that's Chapter 6's big topic. For now, read it as "make me an oscillator."</p>
+
+<pre class="runnable"><code><span class="keyword">let</span> osc;
+<span class="keyword">let</span> playing = <span class="keyword">false</span>;
+
+<span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  osc = <span class="keyword">new</span> p5.<span class="function">Oscillator</span>(<span class="string">'sine'</span>);
+  osc.<span class="function">amp</span>(<span class="number">0.3</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+
+  <span class="comment">// Left = low note, right = high note</span>
+  <span class="keyword">let</span> pitch = <span class="function">map</span>(<span class="function">mouseX</span>, <span class="number">0</span>, <span class="function">width</span>, <span class="number">200</span>, <span class="number">1000</span>);
+  osc.<span class="function">freq</span>(pitch);
+
+  <span class="function">noStroke</span>();
+  <span class="function">fill</span>(<span class="number">255</span>);
+  <span class="function">textAlign</span>(<span class="function">CENTER</span>);
+  <span class="keyword">if</span> (playing) {
+    <span class="function">text</span>(<span class="function">round</span>(pitch) + <span class="string">' Hz'</span>, <span class="function">width</span> / <span class="number">2</span>, <span class="number">30</span>);
+    <span class="function">fill</span>(<span class="number">237</span>, <span class="number">34</span>, <span class="number">93</span>);
+    <span class="function">circle</span>(<span class="function">mouseX</span>, <span class="function">height</span> / <span class="number">2</span>, <span class="number">40</span>);
+  } <span class="keyword">else</span> {
+    <span class="function">text</span>(<span class="string">'Click to turn the sound on'</span>, <span class="function">width</span> / <span class="number">2</span>, <span class="number">30</span>);
+  }
+}
+
+<span class="keyword">function</span> <span class="function">mousePressed</span>() {
+  <span class="keyword">if</span> (playing) {
+    osc.<span class="function">stop</span>();
+  } <span class="keyword">else</span> {
+    osc.<span class="function">start</span>();
+  }
+  playing = !playing;   <span class="comment">// flip true &lt;-&gt; false</span>
+}</code></pre>
+
+<p>Since nothing is loaded from a file, there's no <code>async</code> or <code>await</code> here. The click rule still applies, though: the oscillator starts inside <code>mousePressed()</code>.</p>
+
+<h2 id="common-mistakes">Common Beginner Mistakes <a class="anchor" href="#common-mistakes">#</a></h2>
+
+<div class="error-example">
+<span class="callout-title">Forgetting await</span>
+<code>rocket = loadImage(...)</code> without <code>await</code> doesn't crash — and that's what makes it sneaky. <code>rocket</code> holds the "buzzer," not the image, so <code>image()</code> silently draws <em>nothing</em>. If your image just isn't showing up, check for <code>await</code> first.
+</div>
+
+<div class="error-example">
+<span class="callout-title">Forgetting async</span>
+<code>await</code> inside a plain <code>function setup()</code> stops the whole sketch with an error. Put <code>async</code> in front of <code>function</code>.
+</div>
+
+<div class="error-example">
+<span class="callout-title">Copying preload() from an old tutorial</span>
+In p5.js 1.x, files were loaded in a function called <code>preload()</code>. p5.js 2.x never calls <code>preload()</code>, so the code inside it simply never runs — no error, just missing images. Move the loading into <code>async function setup()</code> with <code>await</code>.
+</div>
+
+<div class="error-example">
+<span class="callout-title">A wrong path or filename</span>
+A typo, the wrong folder, or the wrong capitalization means the browser can't find your file, and p5 will tell you there was <em>a problem loading your file</em>. Compare the path in your code with the actual folder and filename, letter by letter.
+</div>
+
+<div class="error-example">
+<span class="callout-title">Expecting sound before a click</span>
+Calling <code>play()</code> in <code>setup()</code> won't make a sound — the browser blocks it until the user clicks or presses a key. Start sounds from <code>mousePressed()</code> or <code>keyPressed()</code>.
+</div>
+
+<h2 id="exercises">Practice Exercises <a class="anchor" href="#exercises">#</a></h2>
+
+<div class="exercise">
+<span class="callout-title">Exercise 5.5.1 — Your own sprite</span>
+Find or draw a PNG with a transparent background (or make one in an art app). Upload it to your sketch and make it follow the mouse with <code>imageMode(CENTER)</code>. Bonus: draw it at half size.
+</div>
+
+<div class="exercise">
+<span class="callout-title">Exercise 5.5.2 — Photo booth</span>
+Draw the same image four times in a 2-by-2 grid, each with a different <code>tint()</code>. Don't forget <code>noTint()</code> before anything that should look normal.
+</div>
+
+<div class="exercise">
+<span class="callout-title">Exercise 5.5.3 — Soundboard</span>
+Load three different sounds. Write a <code>keyPressed()</code> function that plays one sound when <code>key === 'a'</code>, another for <code>'s'</code>, and the third for <code>'d'</code>. Draw a different colored rectangle on screen for whichever key was pressed last.
+</div>
+
+<div class="exercise">
+<span class="callout-title">Exercise 5.5.4 — Launch sequence</span>
+Start with the "Making an image move" sketch. Change it so the rocket sits still at the bottom until you click. Clicking should play <code>'assets/media/chime.mp3'</code> (or your own sound) and launch the rocket. Hint: use a <code>true</code>/<code>false</code> variable called <code>launched</code>.
+</div>
+
+<div class="exercise">
+<span class="callout-title">Exercise 5.5.5 — Image detective</span>
+This sketch should show a rocket, but it doesn't. Run it, read the message, and fix it. (There are two things to change.)
+<pre class="runnable"><code><span class="keyword">let</span> rocket;
+
+<span class="keyword">function</span> <span class="function">setup</span>() {
+  <span class="function">createCanvas</span>(<span class="number">400</span>, <span class="number">400</span>);
+  rocket = <span class="function">loadImage</span>(<span class="string">'assets/media/rocket.png'</span>);
+}
+
+<span class="keyword">function</span> <span class="function">draw</span>() {
+  <span class="function">background</span>(<span class="number">30</span>, <span class="number">30</span>, <span class="number">60</span>);
+  <span class="function">image</span>(rocket, <span class="number">150</span>, <span class="number">120</span>);
+}</code></pre>
+</div>
+
+<p>Images &amp; sounds: ✅. In Chapter 6 you'll finally learn what that <code>new</code> keyword means — and why <code>pop.play()</code> has a dot in the middle — when we bundle variables and functions together into <strong>objects</strong>.</p>
+
+
+<section class="quiz-section">
+<h2 id="check-yourself">Check Your Understanding <a class="anchor" href="#check-yourself">#</a></h2>
+<p>Quick self-check — no grade, no pressure. Pick an answer to get instant feedback, and rearrange the scrambled program until it works.</p>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 1</span> What does <code>await</code> do in <code>rocket = await loadImage('assets/media/rocket.png');</code>?</p>
+<ol class="quiz-opts">
+<li data-explain="Nothing makes the download faster. await is about waiting, not speeding up.">It makes the image load faster</li>
+<li data-correct="" data-explain="await waits for the file to arrive, so rocket holds the real image instead of a promise.">It pauses setup() until the file has finished loading</li>
+<li data-explain="Resizing happens when you give image() a width and height. await only waits.">It resizes the image to fit the canvas</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 2</span> You put <code>beat.loop(true);</code> in <code>setup()</code>, but you hear nothing. Why?</p>
+<ol class="quiz-opts">
+<li data-explain="MP3 files loop just fine. The problem is something that never happened.">loop() only works with WAV files</li>
+<li data-correct="" data-explain="Right. In the newest p5.sound, loop(true) sets the sound to repeat but doesn&#x27;t start it, and browsers need a click before any sound.">loop(true) only turns repeating on. You still need play(), started by a click</li>
+<li data-explain="Calling it 60 times per second wouldn&#x27;t help. Something still has to start the sound.">loop() has to be called inside draw()</li>
+</ol>
+</div>
+<div class="quiz-card quiz-mc">
+<p class="quiz-q"><span class="quiz-tag">Question 3</span> After <code>imageMode(CENTER)</code>, what does the <em>x</em>, <em>y</em> in <code>image(rocket, x, y)</code> mean?</p>
+<ol class="quiz-opts">
+<li data-explain="That&#x27;s the default, imageMode(CORNER). CENTER changes it.">The top-left corner of the image</li>
+<li data-correct="" data-explain="Just like rectMode(CENTER) for rectangles, imageMode(CENTER) makes x, y the middle of the picture.">The center of the image</li>
+<li data-explain="No mode uses the bottom-right corner. CENTER means center.">The bottom-right corner of the image</li>
+</ol>
+</div>
+<div class="quiz-card parsons">
+<p class="quiz-q"><span class="quiz-tag">Question 4 · Mixed-up program</span> Arrange the lines into a sketch that makes the canvas first, then <em>waits</em> for the rocket image to load, and every frame clears the background and draws the rocket at the mouse. Use the ▲▼ buttons (or drag) to put the lines in order, then press <strong>Check my answer</strong>.</p>
+<pre class="parsons-source" hidden><code>let rocket;
+async function setup() {
+  createCanvas(400, 400);
+  rocket = await loadImage(&#x27;assets/media/rocket.png&#x27;);
+}
+function draw() {
+  background(30, 30, 60);
+  image(rocket, mouseX, mouseY);
+}</code></pre>
+</div>
+</section>
+</main>
+<footer class="chapter-footer wrap">
+  <a href="chapter05.html"><span class="label">← Previous</span><span class="title">Ch. 5: Functions</span></a>
+  <a class="next" href="chapter06.html"><span class="label">Next →</span><span class="title">Ch. 6: Objects</span></a>
+</footer>
+</body>
+</html>

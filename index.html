@@ -477,10 +477,10 @@ footer.site-footer a { color: var(--ink-soft); }
 <main class="wrap">
   <header class="hero">
     <h1>A <span class="accent">p5.js</span> textbook<br>for high-school coders.</h1>
-    <p class="sub">Seven chapters that take you from your first ellipse to particle systems
-       — through shapes, animation, conditionals, loops, functions, classes, and arrays.
+    <p class="sub">Eight chapters that take you from your first ellipse to particle systems
+       — through shapes, animation, conditionals, loops, functions, images and sound, classes, and arrays.
        Heavily inspired by Dan Shiffman's <em>Code! Programming with p5.js</em> on the Coding Train.</p>
-    <p class="meta">Written for high-school students • <strong>~3 hours</strong> of reading • Embedded Coding Train videos throughout</p>
+    <p class="meta">Written for high-school students • <strong>~3½ hours</strong> of reading • Embedded Coding Train videos throughout • Built on <strong>p5.js 2.4</strong></p>
     <p class="meta"><strong>Run and edit the code right on the page</strong> — every complete example has a ▶ Run button, and each chapter ends with a self-check quiz and a mixed-up program to untangle.</p>
   </header>
 
@@ -512,6 +512,11 @@ footer.site-footer a { color: var(--ink-soft); }
     <div class="toc-title">Functions</div>
     <div class="toc-desc">Parameters, return values, scope.</div>
   </a>
+  <a class="toc-card" href="chapter05-5.html">
+    <div class="toc-num">CHAPTER 05.5</div>
+    <div class="toc-title">Images &amp; Sounds</div>
+    <div class="toc-desc">async &amp; await, loadImage(), image(), tint(), loadSound(), oscillators.</div>
+  </a>
   <a class="toc-card" href="chapter06.html">
     <div class="toc-num">CHAPTER 06</div>
     <div class="toc-title">Objects</div>
@@ -534,8 +539,8 @@ footer.site-footer a { color: var(--ink-soft); }
        so students can hear an enthusiastic, beginner-friendly explanation alongside the
        written material. Code samples use a consistent syntax-highlighting palette to make
        keywords, functions, numbers, and strings visually scannable.</p>
-    <p>Every chapter ends with a <em>Common Beginner Mistakes</em> section and four practice exercises.
-       The seven chapters build on each other — by Chapter 7, students are combining
+    <p>Every chapter ends with a <em>Common Beginner Mistakes</em> section and a set of practice exercises.
+       The chapters build on each other — by Chapter 7, students are combining
        classes, arrays, and mouse input to build particle systems from scratch.</p>
   </div>
 
@@ -543,7 +548,8 @@ footer.site-footer a { color: var(--ink-soft); }
   <h2 id="for-teachers">How to use this <a class="anchor" href="#for-teachers">#</a></h2>
   <ul>
     <li>Each chapter is one class period of reading + discussion, or a take-home assignment.</li>
-    <li>Pair each reading with live coding in the <a href="https://editor.p5js.org/" target="_blank" rel="noopener">p5.js Web Editor</a>.</li>
+    <li>Pair each reading with live coding in the <a href="https://editor.p5js.org/" target="_blank" rel="noopener">p5.js Web Editor</a>. Every example targets <strong>p5.js 2.x</strong>, so make sure students' sketches are set to a 2.x version.</li>
+    <li>Many older tutorials and videos load files with <code>preload()</code>, which p5.js 2.x no longer runs. Chapter 5.5 teaches the newer <code>async</code>/<code>await</code> style, and the in-page runner flags <code>preload()</code> if a student pastes it in.</li>
     <li>Use the practice exercises as in-class lab work or homework.</li>
     <li>The "Common Beginner Mistakes" sections are great for whole-class debugging discussions.</li>
     <li>Print-friendly CSS means students can print clean PDFs for offline reading.</li>

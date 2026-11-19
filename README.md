@@ -1,6 +1,6 @@
 # A p5.js Textbook
 
-A self-contained, seven-chapter HTML textbook for teaching creative coding with **p5.js** to high-school students. Heavily inspired by Dan Shiffman's [Coding Train](https://thecodingtrain.com/) and his book *Code! Programming with p5.js*, with embedded Coding Train videos throughout.
+A self-contained, eight-chapter HTML textbook for teaching creative coding with **p5.js** to high-school students. Heavily inspired by Dan Shiffman's [Coding Train](https://thecodingtrain.com/) and his book *Code! Programming with p5.js*, with embedded Coding Train videos throughout.
 
 Built by a high-school Director of Instructional Technology / AP CSA teacher using Claude for a lot of the heavy lifting, intended for classroom use and hosted on GitHub Pages. You can access my live page here: [https://falconphysics.github.io/Programming-Textbook/](https://falconphysics.github.io/Programming-Textbook/). Or you can set up your own version follwing the directions below.
 
@@ -8,13 +8,16 @@ Built by a high-school Director of Instructional Technology / AP CSA teacher usi
 
 ## Chapters
 
-1. **Getting Started** — canvas, shapes, color, coordinates, `setup()` / `draw()`
-2. **Variables** — `mouseX/Y`, `let`, animation, `random()`, `map()`
-3. **Conditionals** — `if` / `else`, bouncing ball, booleans, logical operators
-4. **Loops** — `while`, `for`, nested loops, grids
-5. **Functions** — parameters, return values, scope
-6. **Objects** — ES6 classes (`constructor`, methods, `this`)
-7. **Arrays** — arrays of objects, mouse interaction, `splice()` with backward loops
+- **Ch. 1 · Getting Started** — canvas, shapes, color, coordinates, `setup()` / `draw()`
+- **Ch. 2 · Variables** — `mouseX/Y`, `let`, animation, `random()`, `map()`
+- **Ch. 3 · Conditionals** — `if` / `else`, bouncing ball, booleans, logical operators
+- **Ch. 4 · Loops** — `while`, `for`, nested loops, grids
+- **Ch. 5 · Functions** — parameters, return values, scope
+- **Ch. 5.5 · Images & Sounds** — `async` / `await`, `loadImage()`, `image()`, `tint()`, `loadSound()`, oscillators
+- **Ch. 6 · Objects** — ES6 classes (`constructor`, methods, `this`)
+- **Ch. 7 · Arrays** — arrays of objects, mouse interaction, `splice()` with backward loops
+
+All code targets **p5.js 2.4** (the current release) and the 2.x-era **p5.sound 0.4** library. The biggest change from p5.js 1.x is loading files: `preload()` is gone, replaced by `await` inside `async function setup()`. Chapter 5.5 teaches that pattern, and the examples in the other chapters run unchanged on 2.x.
 
 Each chapter is a single HTML file with all CSS inlined, plus one small shared folder (`assets/`) that powers the interactive features. No build step is required — just open `index.html` in a browser, or host the folder on any static web host.
 
@@ -32,7 +35,14 @@ xdg-open index.html    # Linux
 start index.html       # Windows
 ```
 
-That's it. No server required.
+That's it for reading. To press **Run** on the Chapter 5.5 sketches that load images and sounds, view the book from a web server instead — browsers won't let a page opened as a local file fetch other local files. Any simple server works:
+
+```bash
+cd p5js-textbook
+python3 -m http.server 8000     # then visit http://localhost:8000
+```
+
+(Or just use GitHub Pages, below.)
 
 ---
 
@@ -44,13 +54,14 @@ That's it. No server required.
    ```
    your-repo/
    ├── index.html
-   ├── chapter01.html … chapter07.html
+   ├── chapter01.html … chapter07.html, chapter05-5.html
    ├── assets/
    │   ├── interactive.css
-   │   └── interactive.js
+   │   ├── interactive.js
+   │   └── media/          (images and sounds for Chapter 5.5)
    └── README.md
    ```
-   The `assets/` folder is required — it's what makes the Run buttons and quizzes work.
+   The `assets/` folder is required — it's what makes the Run buttons, quizzes, and Chapter 5.5's media work.
 
 3. **Turn on GitHub Pages.** In your repo, go to **Settings → Pages**, set the source to **Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, then **Save**.
 
@@ -85,16 +96,18 @@ p5js-textbook/
 ├── chapter03.html          # Chapter 3: Conditionals
 ├── chapter04.html          # Chapter 4: Loops
 ├── chapter05.html          # Chapter 5: Functions
+├── chapter05-5.html        # Chapter 5.5: Images & Sounds
 ├── chapter06.html          # Chapter 6: Objects
 ├── chapter07.html          # Chapter 7: Arrays
 ├── assets/
 │   ├── interactive.css     # styles for run/edit widgets & quizzes
-│   └── interactive.js      # live sketch runner, MC quizzes, Parsons Problems
+│   ├── interactive.js      # live sketch runner, MC quizzes, Parsons Problems
+│   └── media/              # rocket.png, stars.jpg, pop.mp3, chime.mp3, beat.mp3
 ├── README.md               # this file
 └── build.sh                # regenerates the .zip package
 ```
 
-Each chapter's *content and styling* is self-contained (all CSS inlined), so the pages still render correctly as plain documents anywhere. The interactive features — Run buttons, quizzes, Parsons Problems — come from the shared `assets/` folder and load progressively: if `interactive.js` is missing or JavaScript is off, the chapter is simply a static textbook page. Live sketches load **p5.js v1.11.3 from the jsDelivr CDN** inside a sandboxed iframe at the moment a student presses Run, so students need an internet connection to run code (but not to read).
+Each chapter's *content and styling* is self-contained (all CSS inlined), so the pages still render correctly as plain documents anywhere. The interactive features — Run buttons, quizzes, Parsons Problems — come from the shared `assets/` folder and load progressively: if `interactive.js` is missing or JavaScript is off, the chapter is simply a static textbook page. Live sketches load **p5.js v2.4.0 from the jsDelivr CDN** inside an iframe at the moment a student presses Run, so students need an internet connection to run code (but not to read). Sketches that use sound also get **p5.sound v0.4.2**, loaded automatically only when the code calls `loadSound()`, `p5.Oscillator`, or another p5.sound feature. To upgrade the whole book later, change the two version constants at the top of `assets/interactive.js`.
 
 ---
 
@@ -133,7 +146,13 @@ The plain source is recovered from the highlighted markup's text content, so not
 <pre id="def-ball-class"><code>class Ball { … }</code></pre>
 <pre class="runnable" data-include="#def-ball-class"><code>let b = new Ball(); …</code></pre>
 ```
-The included code is silently prepended when the student presses Run (and the widget's corner label changes to "Runs with the code above"). Runtime errors appear inside the output frame with an approximate line number — deliberately, so buggy example code becomes a live demo.
+The included code is silently prepended when the student presses Run (and the widget's corner label changes to "Runs with the code above"). Messages appear in a strip above the canvas — deliberately, so buggy example code becomes a live demo:
+
+- **Red:** runtime errors, including errors thrown inside `async setup()`, with an approximate line number.
+- **Amber 🌸:** p5's own Friendly Error System messages (for example, "a problem loading your file"), which normally only reach the browser console.
+- **Amber 🌸 hints:** two loading mistakes that p5.js 2.x fails on *silently* are flagged before the sketch runs — a `preload()` function (from p5.js 1.x tutorials; never called in 2.x) and a `load…()` call assigned without `await`.
+
+**Media in sketches** — relative paths like `'assets/media/rocket.png'` resolve against the chapter page, so put images and sounds in `assets/media/` and refer to them the same way students would in the Web Editor. The sketch frame shares the page's origin, so media loads on any host without CORS setup.
 
 **Multiple-choice question:**
 ```html
@@ -175,6 +194,7 @@ Video IDs used:
 | 3 | 1Osb_iGDdjk, LO3Awjn_gyU, r2S7j54I68c, Rk-_syQluvc |
 | 4 | cnRD9o6odjk, 1c1_TMdf8b8 |
 | 5 | wRHAitGzBrg, zkc417YapfE, qRnUBiTJ66Y |
+| 5.5 | 25omXt_OjD4 |
 | 6 | xG2Vbnv0wvg, T-HGdc8L-7w, rHiSsgFRgx4 |
 | 7 | VIQoUghHSxU, RXWO3mFuW-I, fBqaA7zRO58, TaN5At5RWH8, tA_ZgruFF9k |
 
@@ -226,13 +246,17 @@ SOFTWARE.
 
 Students copying snippets from this book into their own sketches do **not** need to include any attribution — code samples are MIT, copy freely.
 
+### Media files
+
+The images and sounds in `assets/media/` (`rocket.png`, `stars.jpg`, `pop.mp3`, `chime.mp3`, `beat.mp3`) were created for this textbook — drawn and synthesized with code, not taken from anywhere else — and are released under the same **CC BY-SA 4.0** license as the prose.
+
 ### Embedded video content
 
 Embedded Coding Train videos remain the property of Daniel Shiffman / the Coding Train and are *not* covered by this textbook's license. They are embedded via YouTube under YouTube's standard terms.
 
 ### p5.js itself
 
-[p5.js](https://p5js.org/) is its own project, separately licensed under the LGPL 2.1. Nothing in this textbook redistributes p5.js — students load it from the p5.js Web Editor or via CDN as they normally would.
+[p5.js](https://p5js.org/) is its own project, separately licensed under the LGPL 2.1. Nothing in this textbook redistributes p5.js — students load it from the p5.js Web Editor or via CDN as they normally would. The same goes for [p5.sound](https://github.com/processing/p5.sound.js) (LGPL 2.1), which loads from the CDN.
 
 ---
 

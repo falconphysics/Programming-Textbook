@@ -8,13 +8,20 @@
    2. <div class="quiz-mc">       → multiple choice w/ feedback
    3. <div class="parsons">       → drag-or-tap Parsons Problem
 
-   No dependencies. p5.js is loaded from a CDN inside a
-   sandboxed iframe only when a student presses Run.
+   No dependencies. p5.js (and p5.sound, only for sketches that
+   use sound) is loaded from a CDN inside an iframe only when a
+   student presses Run. Media paths like 'assets/media/cat.png'
+   resolve against the textbook page, so they work on any host.
    ============================================================ */
 (function () {
   'use strict';
 
-  var P5_CDN = 'https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js';
+  // To upgrade p5.js for the whole book, change these two lines.
+  var P5_CDN = 'https://cdn.jsdelivr.net/npm/p5@2.4.0/lib/p5.min.js';
+  var P5_SOUND_CDN = 'https://cdn.jsdelivr.net/npm/p5.sound@0.4.2/dist/p5.sound.min.js';
+
+  // Only sketches that touch sound pay the cost of loading p5.sound.
+  var USES_SOUND = /\bloadSound\s*\(|\bp5\.(SoundFile|Oscillator|SinOsc|TriOsc|SqrOsc|SawOsc|Noise|Envelope|Amplitude|FFT|AudioIn|Reverb|Delay)\b|\buserStartAudio\s*\(/;
 
   document.addEventListener('DOMContentLoaded', function () {
     toArray(document.querySelectorAll('pre.runnable')).forEach(initSketch);
@@ -125,7 +132,8 @@
       var code = currentCode();
       output.innerHTML = '';
       output.hidden = false;
-      output.appendChild(buildFrame(support + code, support.split('\n').length - 1));
+      output.appendChild(buildFrame(support + code, support.split('\n').length - 1,
+        loadingHints(code)));
       resetBtn.hidden = false;
       runBtn.textContent = '\u25B6 Run again';
     }
@@ -149,7 +157,85 @@
     });
   }
 
-  function buildFrame(code, lineOffset) {
+  // Runs INSIDE the sketch iframe, before p5 loads. It is
+  // serialized with toString() and collapsed onto one line, so it
+  // must not contain // comments. It shows three kinds of message
+  // above the canvas:
+  //   - runtime errors (red), with the sketch line number
+  //   - errors thrown inside async setup(), which arrive as
+  //     unhandled promise rejections (red)
+  //   - p5's own Friendly Error System notes, the "🌸 p5.js says"
+  //     messages that normally only reach the browser console (amber)
+  function frameHelper(off, hints) {
+    var seen = {};
+    function show(msg, ln, kind) {
+      var box = document.getElementById('p5msg');
+      if (!box) {
+        document.addEventListener('DOMContentLoaded', function () { show(msg, ln, kind); });
+        return;
+      }
+      var text = (kind === 'fes' ? '\u{1F338} ' : '⚠ ') + msg +
+        (ln && ln > off ? ' (around line ' + (ln - off) + ' of your sketch)' : '');
+      if (seen[text] || box.children.length >= 3) return;
+      seen[text] = true;
+      var d = document.createElement('div');
+      d.className = kind === 'fes' ? 'fes' : 'err';
+      d.textContent = text;
+      box.appendChild(d);
+    }
+    window.addEventListener('error', function (e) {
+      if (e.target && e.target !== window && e.target.src) {
+        show('Could not load ' + e.target.src, 0, 'err');
+        return;
+      }
+      show(e.message, e.lineno, 'err');
+    }, true);
+    window.addEventListener('unhandledrejection', function (e) {
+      var r = e.reason, ln = 0;
+      var m = r && r.message ? r.message : String(r);
+      if (r && r.stack) {
+        var x = r.stack.match(/about:srcdoc:(\d+)/);
+        if (x) ln = +x[1];
+      }
+      show(m, ln, 'err');
+    });
+    (hints || []).forEach(function (h) { show(h, 0, 'fes'); });
+    ['log', 'warn', 'error'].forEach(function (level) {
+      var original = console[level];
+      console[level] = function () {
+        var first = arguments[0];
+        if (typeof first === 'string' && first.indexOf('p5.js says') !== -1) {
+          var clean = first.replace(/^\s*\u{1F338}?\s*p5\.js says:\s*/u, '')
+            .replace(/\s*\+ More info:[\s\S]*$/, '')
+            .replace(/\s*\(\[object Request\]\)/, '');
+          show(clean, 0, 'fes');
+        }
+        return original.apply(console, arguments);
+      };
+    });
+  }
+
+  // p5.js 2.x fails SILENTLY on the two most common loading
+  // mistakes, so look for them before running and leave a hint.
+  function loadingHints(code) {
+    var hints = [];
+    var lines = code.split('\n');
+    lines.forEach(function (line, i) {
+      var bare = line.replace(/\/\/.*$/, '');
+      if (/\bfunction\s+preload\s*\(/.test(bare)) {
+        hints.push('Line ' + (i + 1) + ': preload() is from p5.js 1.x and never runs in ' +
+          'p5.js 2.x. Load files with await inside async function setup() instead.');
+      }
+      var m = bare.match(/=\s*(load(?:Image|Sound|Font|JSON|Strings|Table|Model)\s*)\(/);
+      if (m) {
+        hints.push('Line ' + (i + 1) + ': ' + m[1].trim() + '() takes time, so put await in ' +
+          'front of it (inside an async function). Without await you get a promise, not your file.');
+      }
+    });
+    return hints.slice(0, 2);
+  }
+
+  function buildFrame(code, lineOffset, hints) {
     lineOffset = (lineOffset || 0) + 1;
     // Size the frame from createCanvas(w, h) if we can find one.
     var w = 400, h = 400;
@@ -159,29 +245,46 @@
     h = Math.min(Math.max(h, 100), 700);
 
     var safe = code.replace(/<\/script/gi, '<\\/script');
+    var soundTag = USES_SOUND.test(code)
+      ? '<script src="' + P5_SOUND_CDN + '"><\/script>' : '';
+    // Resolve relative media paths against the textbook page.
+    var base = document.baseURI.replace(/"/g, '%22');
 
     // Everything before the user's code sits on ONE line, so a
     // runtime error on document line N is sketch line N - 1.
+    var helper = frameHelper.toString().replace(/\s*\n\s*/g, ' ');
     var doc =
-      '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><base href="' + base + '">' +
       '<style>html,body{margin:0;padding:0}canvas{display:block}' +
-      '#p5err{display:none;font:12px/1.5 Menlo,Consolas,monospace;' +
-      'background:#ffebee;color:#b71c1c;padding:6px 10px;white-space:pre-wrap}</style>' +
-      '<script>window.addEventListener("error",function(e){' +
-      'var d=document.getElementById("p5err");if(!d)return;d.style.display="block";' +
-      'var off=' + lineOffset + ';' +
-      'var ln=e.lineno&&e.lineno>off?" (around line "+(e.lineno-off)+" of your sketch)":"";' +
-      'd.textContent="\\u26A0 "+e.message+ln;});<\/script>' +
-      '<script src="' + P5_CDN + '"><\/script>' +
-      '</head><body><div id="p5err"></div><script>\n' +
+      '#p5msg{font:12px/1.5 Menlo,Consolas,monospace}' +
+      '#p5msg div{padding:6px 10px;white-space:pre-wrap}' +
+      '#p5msg .err{background:#ffebee;color:#b71c1c}' +
+      '#p5msg .fes{background:#fff8e1;color:#5d4200}</style>' +
+      '<script>(' + helper + ')(' + lineOffset + ',' +
+        JSON.stringify(hints || []).replace(/</g, '\\u003c') + ');<\/script>' +
+      '<script src="' + P5_CDN + '"><\/script>' + soundTag +
+      '</head><body><div id="p5msg"></div><script>\n' +
       safe +
       '\n<\/script></body></html>';
 
     var frame = document.createElement('iframe');
-    frame.setAttribute('sandbox', 'allow-scripts');
+    // allow-same-origin lets sketches load images and sounds from
+    // the textbook's own folder on any host without CORS setup.
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    frame.setAttribute('allow', 'autoplay');
     frame.setAttribute('title', 'p5.js sketch output');
     frame.width = w;
     frame.height = h + 4;
+    // Grow the frame when messages appear above the canvas, so the
+    // bottom of the sketch is never cut off.
+    frame.addEventListener('load', function () {
+      try {
+        var body = frame.contentDocument.body;
+        var fit = function () { frame.height = Math.max(h + 4, body.scrollHeight + 4); };
+        if (window.ResizeObserver) new ResizeObserver(fit).observe(body);
+        fit();
+      } catch (e) { /* cross-origin host: keep the canvas-sized frame */ }
+    });
     frame.srcdoc = doc;
     return frame;
   }
